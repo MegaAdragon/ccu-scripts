@@ -38,5 +38,5 @@ foreach (itemID, heating.EnumUsedIDs()) {
 ! check if var needs to be updated
 if (levelSum != heatingVar.Variable().ToInteger()) {
     ! using State(x) is important -> otherwise sys var change will not be triggered correctly
-    !heatingVar.State(levelSum);
+    heatingVar.State(levelSum);
 }
