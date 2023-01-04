@@ -1,0 +1,42 @@
+! Calculate sum of heating request level
+! Copyright (c) 2023 Dominik Zipperle
+
+integer levelSum = 0;
+string itemID;
+
+! get function group
+var heating = dom.GetObject("Heating");
+
+! get system variable
+var heatingVar = dom.GetObject("Heizanforderung");
+
+! iterate over all objects in heating group
+foreach (itemID, heating.EnumUsedIDs()) {
+    ! debug stuff
+    !WriteLine(dom.GetObject(itemID));
+    !WriteLine(dom.GetObject(itemID).HssType());
+    !WriteLine(dom.GetObject(itemID).DPs().EnumUsedNames());
+    
+    ! check type
+    if ((dom.GetObject(itemID).HssType() == "CLIMATECONTROL_FLOOR_TRANSCEIVER")
+        || (dom.GetObject(itemID).HssType() == "HEATING_CLIMATECONTROL_TRANSCEIVER")) {
+
+        ! debug stuff
+        !WriteLine(dom.GetObject(itemID).DPByHssDP("LEVEL_STATUS").State());
+        !WriteLine(dom.GetObject(itemID).DPByHssDP("LEVEL").State());
+        
+        ! check status
+        if (dom.GetObject(itemID).DPByHssDP("LEVEL_STATUS").State() == 0) {
+            levelSum = levelSum + dom.GetObject(itemID).DPByHssDP("LEVEL").State() * 100;
+        }	
+  }
+}  
+
+!WriteLine("sum: " + levelSum);
+!WriteLine(heatingVar.Variable().ToInteger());
+
+! check if var needs to be updated
+if (levelSum != heatingVar.Variable().ToInteger()) {
+    ! using State(x) is important -> otherwise sys var change will not be triggered correctly
+    !heatingVar.State(levelSum);
+}
