@@ -1,0 +1,34 @@
+! Switch off all lights
+! Copyright (c) 2022 Dominik Zipperle
+
+string itemID;
+
+! get light function group
+var i = dom.GetObject("Light");
+
+! iterate over all objects in group
+foreach(itemID, i.EnumUsedIDs()) 
+{
+    var item = dom.GetObject(itemID);
+    
+    ! debug stuff
+    !WriteLine(item);
+    !WriteLine(item.Type()); ! OT_CHANNEL -> 33
+    !WriteLine(item.HssType());
+
+    ! check type
+    if (item.IsTypeOf(OT_CHANNEL)) 
+    {
+        var device = dom.GetObject(item.Device());
+      
+        ! debug stuff
+        !WriteLine(device);
+        !WriteLine(device.HssType());
+        
+        if (device.HssType() == "HmIPW-DRD3") {
+            item.DPByHssDP("LEVEL").State(0);  ! set dimmer
+        } else {
+            item.DPByHssDP("STATE").State(0);  ! switch off light
+        }
+    }
+}
